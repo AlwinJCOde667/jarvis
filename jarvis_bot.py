@@ -284,30 +284,56 @@ def find_and_read_email(request):
     elif "yesterday" in lower:
         query = "newer_than:2d older_than:1d"
 
+    elif "unread" in lower:
+        query = "is:unread"
+
     else:
         query = "newer_than:7d"
 
-    results = service.users().messages().list(
-        userId="me",
-        q=query,
-        maxResults=5
-    ).execute()
+    try:
+        results = service.users().messages().list(
+            userId="me",
+            q=query,
+            maxResults=10
+        ).execute()
 
-    messages = results.get(
-        "messages",
-        []
-    )
+        messages = results.get("messages", [])
 
-    if not messages:
-        return "I couldn't find any matching emails."
+        if not messages:
+            return "I couldn't find any matching emails."
 
-    # Use the newest matching email
-    message_id = messages[0]["id"]
+        output = []
 
-    return read_gmail_message(
-        message_id
-    )
+        for msg in messages:
+            email = service.users().messages().get(
+                userId="me",
+                id=msg["id"],
+                format="metadata",
+                metadataHeaders=["From", "Subject", "Date"]
+            ).execute()
 
+            headers = email.get("payload", {}).get("headers", [])
+
+            data = {}
+
+            for header in headers:
+                data[header["name"]] = header["value"]
+
+            sender = data.get("From", "Unknown")
+            subject = data.get("Subject", "(No subject)")
+            date = data.get("Date", "")
+
+            output.append(
+                f"From: {sender}\n"
+                f"Subject: {subject}\n"
+                f"Date: {date}"
+            )
+
+        return "📧 Matching emails:\n\n" + "\n\n".join(output)
+
+    except Exception as e:
+        print("Gmail search error:", e)
+        return "I couldn't access Gmail right now."
 
 # =========================
 # START
