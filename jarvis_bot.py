@@ -33,8 +33,8 @@ SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly"
 ]
 
-CREDENTIALS_FILE = r"C:\jarvis\credentials.json"
-TOKEN_FILE = r"C:\jarvis\gmail_token.json"
+CREDENTIALS_FILE = os.environ.get("GOOGLE_CREDENTIALS_FILE", "credentials.json")
+TOKEN_FILE = os.environ.get("GMAIL_TOKEN_FILE", "gmail_token.json")
 
 
 # =========================
