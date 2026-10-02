@@ -498,12 +498,15 @@ async def chat(
         # -------------------------
 
         gmail_words = [
-            "email",
-            "emails",
-            "mail",
-            "inbox",
-            "gmail"
-        ]
+    "email",
+    "emails",
+    "mail",
+    "inbox",
+    "gmail",
+    "amazon",
+    "linkedin",
+    "unread"
+]
 
         if any(
             word in lower
