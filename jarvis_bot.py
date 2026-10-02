@@ -1,3 +1,4 @@
+import base64
 import os
 import asyncio
 
@@ -24,6 +25,20 @@ from googleapiclient.discovery import build
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+def restore_gmail_files():
+    credentials_b64 = os.environ.get("GOOGLE_CREDENTIALS_B64")
+    token_b64 = os.environ.get("GMAIL_TOKEN_B64")
+
+    if credentials_b64:
+        with open(CREDENTIALS_FILE, "wb") as f:
+            f.write(base64.b64decode(credentials_b64))
+
+    if token_b64:
+        with open(TOKEN_FILE, "wb") as f:
+            f.write(base64.b64decode(token_b64))
+
+
+restore_gmail_files()
 
 OWNER_CHAT_ID = 2009288738
 
