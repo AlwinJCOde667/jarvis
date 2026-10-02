@@ -1,0 +1,42 @@
+import os
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+from google import genai
+
+app = FastAPI()
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+if not GEMINI_API_KEY:
+    raise RuntimeError("GEMINI_API_KEY is missing.")
+
+client = genai.Client(
+    api_key=GEMINI_API_KEY
+)
+
+MODEL = "gemini-3.8-flash"
+
+
+class VoiceRequest(BaseModel):
+    text: str
+
+
+@app.get("/")
+def home():
+    return {
+        "status": "Jarvis voice server is running"
+    }
+
+
+@app.post("/ask")
+def ask_jarvis(request: VoiceRequest):
+
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=request.text
+    )
+
+    return {
+        "reply": response.text
+    }
