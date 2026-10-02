@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis Voice</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #aaa;
+        }
+
+        button {
+            margin-top: 30px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: none;
+            font-size: 55px;
+            cursor: pointer;
+            background: #222;
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #status {
+            margin-top: 25px;
+            color: #aaa;
+        }
+
+        #transcript {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>JARVIS</h1>
+
+    <p>Voice Assistant</p>
+
+    <button id="talkButton">🎙️</button>
+
+    <div id="status">Tap the microphone to talk</div>
+
+    <div id="transcript"></div>
+
+</div>
+
+<script>
+
+const talkButton = document.getElementById("talkButton");
+const status = document.getElementById("status");
+const transcript = document.getElementById("transcript");
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+
+    status.innerText =
+        "Voice recognition is not supported in this browser.";
+
+} else {
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    talkButton.onclick = () => {
+
+        status.innerText = "Listening...";
+
+        transcript.innerText = "";
+
+        recognition.start();
+    };
+
+   recognition.onresult = async (event) => {
+    const text =
+        event.results[0][0].transcript;
+
+    transcript.innerText = text;
+
+    status.innerText = "Jarvis is thinking...";
+
+const response = await fetch(
+    "https://jarvis-voice.getvoroa.com/ask",
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            text: text
+        })
+    }
+);
+
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+
+let reply = "";
+
+while (true) {
+
+    const { value, done } = await reader.read();
+
+    if (done) {
+        break;
+    }
+
+    const chunk = decoder.decode(value, {
+        stream: true
+    });
+
+    reply += chunk;
+
+    transcript.innerText = reply;
+}
+
+const speech = new SpeechSynthesisUtterance(reply);
+
+speech.lang = "en-IN";
+speech.rate = 1;
+speech.pitch = 1;
+
+speechSynthesis.speak(speech);
+
+status.innerText = "Jarvis is ready.";
+};
+    recognition.onerror = (event) => {
+
+        status.innerText =
+            "Microphone error: " + event.error;
+    };
+
+    recognition.onend = () => {
+
+        if (status.innerText === "Listening...") {
+            status.innerText = "Tap the microphone to talk";
+        }
+    };
+}
+
+</script>
+
+</body>
+</html>
