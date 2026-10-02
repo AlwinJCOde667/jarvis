@@ -2,7 +2,6 @@ import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from google import genai
 
@@ -42,24 +41,16 @@ def home():
 @app.post("/ask")
 def ask_jarvis(request: VoiceRequest):
 
-    def generate():
-
-        response = client.models.generate_content_stream(
-            model=MODEL,
-            contents=(
-                "You are Jarvis, a fast voice assistant. "
-                "Reply naturally and briefly. "
-                "For voice responses, use no more than 2 short sentences. "
-                "User says: " + request.text
-            )
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=(
+            "You are Jarvis, a fast voice assistant. "
+            "Reply naturally and briefly. "
+            "For voice responses, use no more than 2 short sentences. "
+            "User says: " + request.text
         )
-
-        for chunk in response:
-
-            if chunk.text:
-                yield chunk.text
-
-    return StreamingResponse(
-        generate(),
-        media_type="text/plain"
     )
+
+    return {
+        "reply": response.text
+    }
