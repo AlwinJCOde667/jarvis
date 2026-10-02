@@ -25,6 +25,18 @@ from googleapiclient.discovery import build
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+CREDENTIALS_FILE = os.environ.get(
+    "GOOGLE_CREDENTIALS_FILE",
+    "credentials.json"
+)
+
+TOKEN_FILE = os.environ.get(
+    "GMAIL_TOKEN_FILE",
+    "gmail_token.json"
+)
+
+
 def restore_gmail_files():
     credentials_b64 = os.environ.get("GOOGLE_CREDENTIALS_B64")
     token_b64 = os.environ.get("GMAIL_TOKEN_B64")
