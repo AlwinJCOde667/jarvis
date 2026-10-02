@@ -1,7 +1,7 @@
 import base64
 import os
 import asyncio
-
+from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -282,7 +282,13 @@ def find_and_read_email(request):
         query = "newer_than:1d"
 
     elif "yesterday" in lower:
-        query = "newer_than:2d older_than:1d"
+        yesterday = datetime.now() - timedelta(days=1)
+        today = datetime.now()
+
+        query = (
+            f"after:{yesterday.strftime('%Y/%m/%d')} "
+            f"before:{today.strftime('%Y/%m/%d')}"
+        )
 
     elif "unread" in lower:
         query = "is:unread"
