@@ -282,13 +282,7 @@ def find_and_read_email(request):
         query = "newer_than:1d"
 
     elif "yesterday" in lower:
-        yesterday = datetime.now() - timedelta(days=1)
-        today = datetime.now()
-
-        query = (
-            f"after:{yesterday.strftime('%Y/%m/%d')} "
-            f"before:{today.strftime('%Y/%m/%d')}"
-        )
+        query = "newer_than:3d"
 
     elif "unread" in lower:
         query = "is:unread"
@@ -300,7 +294,7 @@ def find_and_read_email(request):
         results = service.users().messages().list(
             userId="me",
             q=query,
-            maxResults=10
+            maxResults=20
         ).execute()
 
         messages = results.get("messages", [])
@@ -308,39 +302,56 @@ def find_and_read_email(request):
         if not messages:
             return "I couldn't find any matching emails."
 
-        output = []
+        # For "yesterday", filter using the actual email date
+        if "yesterday" in lower:
+            yesterday = (datetime.now() - timedelta(days=1)).date()
 
-        for msg in messages:
-            email = service.users().messages().get(
-                userId="me",
-                id=msg["id"],
-                format="metadata",
-                metadataHeaders=["From", "Subject", "Date"]
-            ).execute()
+            matching_messages = []
 
-            headers = email.get("payload", {}).get("headers", [])
+            for msg in messages:
+                email = service.users().messages().get(
+                    userId="me",
+                    id=msg["id"],
+                    format="metadata",
+                    metadataHeaders=["From", "Subject", "Date"]
+                ).execute()
 
-            data = {}
+                headers = email.get("payload", {}).get("headers", [])
 
-            for header in headers:
-                data[header["name"]] = header["value"]
+                email_date = None
 
-            sender = data.get("From", "Unknown")
-            subject = data.get("Subject", "(No subject)")
-            date = data.get("Date", "")
+                for header in headers:
+                    if header["name"].lower() == "date":
+                        email_date = header["value"]
+                        break
 
-            output.append(
-                f"From: {sender}\n"
-                f"Subject: {subject}\n"
-                f"Date: {date}"
-            )
+                if email_date:
+                    try:
+                        from email.utils import parsedate_to_datetime
 
-        return "📧 Matching emails:\n\n" + "\n\n".join(output)
+                        parsed_date = parsedate_to_datetime(email_date)
+
+                        if parsed_date.astimezone().date() == yesterday:
+                            matching_messages.append(msg)
+
+                    except Exception as e:
+                        print("Date parsing error:", e)
+
+            messages = matching_messages
+
+            if not messages:
+                return "I couldn't find any emails from yesterday."
+
+        # Use the newest matching email
+        message_id = messages[0]["id"]
+
+        return read_gmail_message(
+            message_id
+        )
 
     except Exception as e:
         print("Gmail search error:", e)
         return "I couldn't access Gmail right now."
-
 # =========================
 # START
 # =========================
