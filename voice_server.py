@@ -1,4 +1,5 @@
 import os
+import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -40,11 +41,24 @@ def home():
 @app.post("/ask")
 def ask_jarvis(request: VoiceRequest):
 
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=request.text
-    )
+import time
 
-    return {
-        "reply": response.text
-    }
+for attempt in range(3):
+    try:
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=request.text
+        )
+
+        return {
+            "reply": response.text
+        }
+
+    except Exception as e:
+
+        if attempt == 2:
+            return {
+                "reply": "Sorry, I am having trouble connecting to Gemini right now."
+            }
+
+        time.sleep(2)
