@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from google import genai
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -41,24 +42,23 @@ def home():
 @app.post("/ask")
 def ask_jarvis(request: VoiceRequest):
 
-import time
+    for attempt in range(3):
 
-for attempt in range(3):
-    try:
-        response = client.models.generate_content(
-            model=MODEL,
-            contents=request.text
-        )
+        try:
+            response = client.models.generate_content(
+                model=MODEL,
+                contents=request.text
+            )
 
-        return {
-            "reply": response.text
-        }
-
-    except Exception as e:
-
-        if attempt == 2:
             return {
-                "reply": "Sorry, I am having trouble connecting to Gemini right now."
+                "reply": response.text
             }
 
-        time.sleep(2)
+        except Exception as e:
+
+            if attempt == 2:
+                return {
+                    "reply": "Sorry, I am having trouble connecting to Gemini right now."
+                }
+
+            time.sleep(2)
