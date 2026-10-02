@@ -108,16 +108,27 @@ if (!SpeechRecognition) {
         recognition.start();
     };
 
-    recognition.onresult = (event) => {
+   recognition.onresult = (event) => {
 
-        const text =
-            event.results[0][0].transcript;
+    const text =
+        event.results[0][0].transcript;
 
-        transcript.innerText = text;
+    transcript.innerText = text;
 
-        status.innerText = "You said: " + text;
-    };
+    status.innerText = "Jarvis is thinking...";
 
+    const reply = "Hello. I am listening.";
+
+    const speech = new SpeechSynthesisUtterance(reply);
+
+    speech.lang = "en-IN";
+    speech.rate = 1;
+    speech.pitch = 1;
+
+    speechSynthesis.speak(speech);
+
+    status.innerText = "Jarvis is ready.";
+};
     recognition.onerror = (event) => {
 
         status.innerText =
