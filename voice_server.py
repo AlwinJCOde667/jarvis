@@ -42,23 +42,16 @@ def home():
 @app.post("/ask")
 def ask_jarvis(request: VoiceRequest):
 
-    for attempt in range(3):
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=(
+            "You are Jarvis, a fast voice assistant. "
+            "Reply naturally and briefly. "
+            "For voice responses, use no more than 2 short sentences. "
+            "User says: " + request.text
+        )
+    )
 
-        try:
-            response = client.models.generate_content(
-                model=MODEL,
-                contents=request.text
-            )
-
-            return {
-                "reply": response.text
-            }
-
-        except Exception as e:
-
-            if attempt == 2:
-                return {
-                    "reply": "Sorry, I am having trouble connecting to Gemini right now."
-                }
-
-            time.sleep(2)
+    return {
+        "reply": response.text
+    }
