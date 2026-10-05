@@ -38,14 +38,6 @@ In the Marvel films, Tony Stark's J.A.R.V.I.S. (**J**ust **A** **R**ather **V**e
 | Understands natural requests | "Read my latest Amazon email" works, no command needed |
 | Always on, always listening | Runs as a long-polling bot with a 60-second inbox watch |
 
-> 🎥 **Add your demo here:** drop a screen recording of the bot or the voice page into `assets/` and link it below.
->
-> ```md
-> https://github.com/user-attachments/assets/YOUR-VIDEO-ID
-> ```
->
-> (On GitHub, drag a `.mp4` into the README editor and it will host it for you and generate this link.)
-
 ---
 
 ## ✨ Features
