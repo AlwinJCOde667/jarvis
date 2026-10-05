@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/jarvis-hud.svg" alt="JARVIS HUD" width="100%"/>
+<img src="jarvis-hud.svg" alt="JARVIS HUD" width="100%"/>
 
 <a href="https://github.com/AlwinJCOde667/jarvis">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=4DF0FF&center=true&vCenter=true&width=700&lines=Good+evening%2C+Sir.;Jarvis+is+online.+%F0%9F%A4%96;You+have+3+new+emails.;Just+A+Rather+Very+Intelligent+System." alt="Typing animation" />
